@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bots - Kevin Svenson Crypto</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(circle at 25% 25%, rgba(0, 255, 157, 0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(255, 184, 0, 0.04) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00ff9d, #ffb800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00ff9d;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 2rem 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .page-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffffff, #00ff9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 1.3rem;
+            color: #b0b0b0;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .execution-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00ff9d;
+            font-style: italic;
+        }
+
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .bot-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.08), rgba(255, 184, 0, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .bot-card:hover::before {
+            opacity: 1;
+        }
+
+        .bot-card:hover {
+            transform: translateY(-15px);
+            border-color: rgba(0, 255, 157, 0.4);
+            box-shadow: 0 25px 50px rgba(0, 255, 157, 0.15);
+        }
+
+        .bot-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bot-name-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bot-icon {
+            font-size: 2.5rem;
+            color: #00ff9d;
+        }
+
+        .bot-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .bot-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-live {
+            background: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+            border: 1px solid rgba(0, 255, 157, 0.3);
+        }
+
+        .status-beta {
+            background: rgba(255, 184, 0, 0.2);
+            color: #ffb800;
+            border: 1px solid rgba(255, 184, 0, 0.3);
+        }
+
+        .bot-description {
+            color: #b0b0b0;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bot-performance {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .performance-title {
+            font-weight: 600;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .performance-stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .positive {
+            color: #00ff9d;
+        }
+
+        .negative {
+            color: #ff6b6b;
+        }
+
+        .bot-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bot-features li {
+            color: #d0d0d0;
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .bot-features li::before {
+            content: '⚙️';
+            position: absolute;
+            left: 0;
+            font-size: 0.9rem;
+        }
+
+        .bot-pricing {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pricing-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00ff9d;
+        }
+
+        .price-period {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .setup-fee {
+            font-size: 0.8rem;
+            color: #ffb800;
+        }
+
+        .get-bot-btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #00ff9d, #00cc7a);
+            color: #000;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .get-bot-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 255, 157, 0.4);
+        }
+
+        .features-section {
+            margin-top: 5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 30px;
+            padding: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #ffffff, #00ff9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(0, 255, 157, 0.05);
+            border-color: rgba(0, 255, 157, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #00ff9d;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .feature-description {
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+
+        .setup-section {
+            margin-top: 5rem;
+        }
+
+        .setup-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .setup-step {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ff9d, #00cc7a);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin: 0 auto 1rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .step-description {
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .bots-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .performance-stats {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .bot-pricing {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 100px 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Kevin Svenson Crypto</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="content_analysis_page.html">Content</a></li>
+                <li><a href="trading_bots_page.html" class="active">Trading Bots</a></li>
+                <li><a href="blog_page.html">Blog</a></li>
+                <li><a href="news_page.html">News</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Automate With Confidence</h1>
+            <p class="page-subtitle">
+                Live-tested Pine Script strategies, optimized for bot execution. All bots are designed for precision timing, risk-defined logic, and macro alignment — so you can act fast without overtrading.
+            </p>
+            <div class="execution-text">Execution-ready with webhook alerts.</div>
+        </div>
+
+        <div class="bots-grid">
+            <div class="bot-card">
+                <div class="bot-header">
+                    <div class="bot-name-section">
+                        <div class="bot-icon">⚙️</div>
+                        <div class="bot-name">Sweeper Pro</div>
+                    </div>
+                    <div class="bot-status status-live">Live</div>
+                </div>
+                <p class="bot-description">
+                    5-minute scalping suite designed for high-frequency Bitcoin trading. Combines momentum analysis with volume confirmation for precise entries and quick exits.
+                </p>
+                <div class="bot-performance">
+                    <div class="performance-title">📊 30-Day Performance</div>
+                    <div class="performance-stats">
+                        <div class="performance-stat">
+                            <span class="stat-value positive">+24.7%</span>
+                            <span class="stat-label">Total Return</span>
+                        </div>
+                        <div class="performance-stat">
+                            <span class="stat-value">68%</span>
+                            <span class="stat-label">Win Rate</span>
+                        </div>
+                        <div class="performance-stat">
+                            <span class="stat-value negative">-3.2%</span>
+                            <span class="stat-label">Max Drawdown</span>
+                        </div>
+                    </div>
+                </div>
+                <ul class="bot-features">
+                    <li>5-minute timeframe optimization</li>
+                    <li>Dynamic stop-loss management</li>
+                    <li>Volume-weighted entry signals</li>
+                    <li>Real-time webhook alerts</li>
+                    <li>Backtested on 2+ years of data</li>
+                </ul>
+                <div class="bot-pricing">
+                    <div class="pricing-info">
+                        <span class="price">$197</span>
+                        <span class="price-period">per month</span>
+                        <span class="setup-fee">$99 setup fee</span>
+                    </div>
+                    <a href="#" class="get-bot-btn">Deploy Bot</a>
+                </div>
+            </div>
+
+            <div class="bot-card">
+                <div class="bot-header">
+                    <div class="bot-name-section">
+                        <div class="bot-icon">📈</div>
+                        <div class="bot-name">RSI Parabola Strategy</div>
+                    </div>
+                    <div class="bot-status status-live">Live</div>
+                </div>
+                <p class="bot-description">
+                    Advanced RSI strategy that identifies parabolic moves and reversal points. Perfect for swing trading with built-in risk management and position sizing.
+                </p>
+                <div class="bot-performance">
+                    <div class="performance-title">📊 30-Day Performance</div>
+                    <div class="performance-stats">
+                        <div class="performance-stat">
+                            <span class="stat-value positive">+31.2%</span>
+                            <span class="stat-label">Total Return</span>
+                        </div>
+                        <div class="performance-stat">
+                            <span class="stat-value">74%</span>
+                            <span class="stat-label">Win Rate</span>
+                        </div>
+                        <div class="performance-stat">
+                            <span class="stat-value negative">-5.8%</span>
+                            <span class="stat-label">Max Drawdown</span>
+                        </div>
+                    </div>
+                </div>
+                <ul class="bot-features">
+                    <li>Multi-timeframe RSI analysis</li>
+                    <li>Parabolic reversal detection</li>
+                    <li>Adaptive position sizing</li>
+                    <li>Trend confirmation filters</li>
+                    <li>Extended backtesting validation</li>
+                </ul>
+                <div class="bot-pricing">
+                    <div class="pricing-info">
+                        <span class="price">$247</span>
+                        <span class="price-period">per month</span>
+                        <span class="setup-fee">$149 setup fee</span>
+                    </div>
+                    <a href="#" class="get-bot-btn">Deploy Bot</a>
+                </div>
+            </div>
+
+            <div class="bot-card">
+                <div class="bot-header">
+                    <div class="bot-name-section">
+                        <div class="bot-icon">🎯</div>
+                        <div class="bot-name">Dynamic Pi Bounce</div>
+                    </div>
+                    <div class="bot-status status-beta">Beta</div>
+                </div>
+                <p class="bot-description">
+                    Revolutionary algorithm based on Pi cycle mathematics and Fibonacci retracements. Designed to catch major Bitcoin cycle tops and bottoms with exceptional accuracy.
+                </p>
+                <div class="bot-performance">
+                    <div class="performance-title">📊 Beta Performance</div>
+                    <div class="performance-stats">
+                        <div class="performance-stat">
+                            <span class="stat-value positive">+47.3%</span>
+                            <span class="stat-label">Total Return</span>
+                        </div>
+                        <div class="performance-stat">
+                            <span class="stat-value">82%</span>
+                            <span class="stat-label">Win Rate</span>
+                        </div>
+                        <div class="performance-stat">
+                            <span class="stat-value negative">-2.1%</span>
+                            <span class="stat-label">Max Drawdown</span>
+                        </div>
+                    </div>
+                </div>
+                <ul class="bot-features">
+                    <li>Pi cycle top/bottom detection</li>
+                    <li>Fibonacci retracement levels</li>
+                    <li>Long-term cycle analysis</li>
+                    <li>Minimal trade frequency</li>
+                    <li>Beta testing phase pricing</li>
+                </ul>
+                <div class="bot-pricing">
+                    <div class="pricing-info">
+                        <span class="price">$127</span>
+                        <span class="price-period">per month</span>
+                        <span class="setup-fee">Beta Access</span>
+                    </div>
+                    <a href="#" class="get-bot-btn">Join Beta</a>
+                </div>
+            </div>
+        </div>
+
+        <section class="features-section">
+            <h2 class="section-title">Why Choose Kevin's Trading Bots?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Risk Management</h3>
+                    <p class="feature-description">Built-in stop losses, position sizing, and drawdown protection to preserve your capital in all market conditions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Instant Execution</h3>
+                    <p class="feature-description">Lightning-fast webhook alerts ensure you never miss a trade opportunity, even when you're away from your screen.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Live Performance</h3>
+                    <p class="feature-description">Real-time performance tracking with detailed analytics and transparent reporting of all trades and results.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Continuous Updates</h3>
+                    <p class="feature-description">Regular strategy improvements and market adaptation to ensure consistent performance across all conditions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎓</div>
+                    <h3 class="feature-title">Full Documentation</h3>
+                    <p class="feature-description">Complete setup guides, strategy explanations, and ongoing support to maximize your trading success.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">Easy Integration</h3>
+                    <p class="feature-description">Compatible with all major exchanges and trading platforms. Get up and running in minutes, not hours.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="setup-section">
+            <h2 class="section-title">Simple Setup Process</h2>
+            <div class="setup-steps">
+                <div class="setup-step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Choose Your Bot</h3>
+                    <p class="step-description">Select the trading strategy that matches your risk tolerance and trading style.</p>
+                </div>
+                <div class="setup-step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Connect Exchange</h3>
+                    <p class="step-description">Link your exchange account using secure API keys with trading permissions only.</p>
+                </div>
+                <div class="setup-step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Configure Settings</h3>
+                    <p class="step-description">Set your position size, risk parameters, and notification preferences.</p>
+                </div>
+                <div class="setup-step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Deploy & Monitor</h3>
+                    <p class="step-description">Activate your bot and track performance through our detailed dashboard.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Add progressive loading animation for bot cards
+        const botCards = document.querySelectorAll('.bot-card');
+        botCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.8s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 300);
+        });
+
+        // Simulate bot deployment
+        document.querySelectorAll('.get-bot-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const originalText = button.textContent;
+                button.style.transform = 'scale(0.95)';
+                button.textContent = 'Processing...';
+                
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                    button.textContent = originalText;
+                    // In a real app, this would redirect to deployment setup
+                    console.log('Redirecting to bot deployment...');
+                }, 1500);
+            });
+        });
+
+        // Add real-time performance simulation
+        function updatePerformanceStats() {
+            const performanceValues = document.querySelectorAll('.stat-value');
+            performanceValues.forEach(value => {
+                if (value.classList.contains('positive')) {
+                    const currentValue = parseFloat(value.textContent.replace('%', '').replace('+', ''));
+                    const change = (Math.random() - 0.5) * 0.2;
+                    const newValue = (currentValue + change).toFixed(1);
+                    value.textContent = `+${newValue}%`;
+                }
+            });
+        }
+
+        // Update performance stats every 10 seconds for demo
+        setInterval(updatePerformanceStats, 10000);
+
+        // Add hover effects to performance stats
+        document.querySelectorAll('.bot-performance').forEach(performance => {
+            performance.addEventListener('mouseenter', () => {
+                performance.style.background = 'rgba(0, 255, 157, 0.1)';
+            });
+            
+            performance.addEventListener('mouseleave', () => {
+                performance.style.background = 'rgba(0, 0, 0, 0.3)';
+            });
+        });
+    </script>
+</body>
+</html>
