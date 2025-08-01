@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Journal - Kevin Svenson Crypto</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(circle at 40% 30%, rgba(0, 255, 157, 0.05) 0%, transparent 60%),
+                        radial-gradient(circle at 60% 70%, rgba(255, 184, 0, 0.03) 0%, transparent 60%);
+            animation: drift 15s ease-in-out infinite;
+        }
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00ff9d, #ffb800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00ff9d;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 2rem 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .page-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffffff, #00ff9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 1.3rem;
+            color: #b0b0b0;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .featured-post {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .featured-post:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 255, 157, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 255, 157, 0.1);
+        }
+
+        .featured-image {
+            height: 250px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 255, 157, 0.1), rgba(255, 184, 0, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .featured-post:hover .featured-image::before {
+            opacity: 1;
+        }
+
+        .image-placeholder {
+            font-size: 3rem;
+            color: #00ff9d;
+        }
+
+        .post-content {
+            padding: 2rem;
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .post-category {
+            background: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .post-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .post-excerpt {
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .read-more {
+            color: #00ff9d;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: #ffffff;
+        }
+
+        .post-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .post-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 255, 157, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .post-item .post-title {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #00ff9d;
+        }
+
+        .recent-posts {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .recent-post {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .recent-post:hover {
+            background: rgba(0, 255, 157, 0.05);
+        }
+
+        .recent-post-title {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .recent-post-date {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .categories {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-item:hover {
+            background: rgba(0, 255, 157, 0.05);
+        }
+
+        .category-name {
+            color: #d0d0d0;
+        }
+
+        .category-count {
+            color: #00ff9d;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .newsletter-signup {
+            text-align: center;
+        }
+
+        .newsletter-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-input:focus {
+            border-color: rgba(0, 255, 157, 0.3);
+        }
+
+        .newsletter-input::placeholder {
+            color: #888;
+        }
+
+        .newsletter-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(45deg, #00ff9d, #00cc7a);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 157, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 100px 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Kevin Svenson Crypto</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="content_analysis_page.html">Content</a></li>
+                <li><a href="trading_bots_page.html">Trading Bots</a></li>
+                <li><a href="blog_page.html" class="active">Blog</a></li>
+                <li><a href="news_page.html">News</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Kevin's Market Journal</h1>
+            <p class="page-subtitle">
+                Stay sharp with real-time trading notes, macro updates, and insights into market extremes. From sentiment shifts to positioning logic — every post is a lesson in timing the untimed.
+            </p>
+        </div>
+
+        <div class="blog-grid">
+            <main class="main-content">
+                <article class="featured-post">
+                    <div class="featured-image">
+                        <div class="image-placeholder">📊</div>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-meta">
+                            <span class="post-category">Market Analysis</span>
+                            <span>•</span>
+                            <span>2 hours ago</span>
+                            <span>•</span>
+                            <span>8 min read</span>
+                        </div>
+                        <h2 class="post-title">Why BTC Reacts to S&P500 Liquidity</h2>
+                        <p class="post-excerpt">
+                            Understanding the hidden correlation between Bitcoin price action and traditional market liquidity flows. This analysis breaks down the macro mechanics driving crypto markets and reveals why savvy traders watch equity futures more than crypto Twitter.
+                        </p>
+                        <a href="#" class="read-more">Read Full Analysis →</a>
+                    </div>
+                </article>
+
+                <article class="post-item">
+                    <div class="post-meta">
+                        <span class="post-category">Strategy</span>
+                        <span>•</span>
+                        <span>5 hours ago</span>
+                        <span>•</span>
+                        <span>6 min read</span>
+                    </div>
+                    <h2 class="post-title">Managing Stops in Hyper Volatility</h2>
+                    <p class="post-excerpt">
+                        A guide to setting intelligent stop-losses during periods of extreme market volatility to protect your capital without getting stopped out prematurely.
+                    </p>
+                </article>
+
+                <article class="post-item">
+                    <div class="post-meta">
+                        <span class="post-category">Technical Analysis</span>
+                        <span>•</span>
+                        <span>1 day ago</span>
+                        <span>•</span>
+                        <span>10 min read</span>
+                    </div>
+                    <h2 class="post-title">Bullish Divergences That Actually Matter</h2>
+                    <p class="post-excerpt">
+                        Not all bullish divergences are created equal. This post highlights the most reliable patterns to look for across different market conditions.
+                    </p>
+                </article>
+            </main>
+
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Recent Posts</h3>
+                    <div class="recent-posts">
+                        <div class="recent-post">
+                            <h4 class="recent-post-title">DeFi Summer 2.0: Positioning for the Next Wave</h4>
+                            <div class="recent-post-date">1 week ago</div>
+                        </div>
+                        <div class="recent-post">
+                            <h4 class="recent-post-title">Ethereum's Next Major Upgrade Impact</h4>
+                            <div class="recent-post-date">1 week ago</div>
+                        </div>
+                        <div class="recent-post">
+                            <h4 class="recent-post-title">Crypto Market Cycle in 2024</h4>
+                            <div class="recent-post-date">2 weeks ago</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Categories</h3>
+                    <div class="categories">
+                        <div class="category-item">
+                            <span class="category-name">Market Analysis</span>
+                            <span class="category-count">12</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Technical Analysis</span>
+                            <span class="category-count">8</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Strategy</span>
+                            <span class="category-count">15</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Macro</span>
+                            <span class="category-count">5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section newsletter-signup">
+                    <h3 class="sidebar-title">Stay Updated</h3>
+                    <p class="page-subtitle" style="font-size: 1rem; margin-bottom: 1rem;">Get Kevin's weekly market digest straight to your inbox.</p>
+                    <input type="email" class="newsletter-input" placeholder="Your email address">
+                    <button class="newsletter-btn">Subscribe Now</button>
+                </div>
+            </aside>
+        </div>
+    </div>
+</body>
+</html>
