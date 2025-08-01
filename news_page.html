@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto News - Kevin Svenson Crypto</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(circle at 35% 45%, rgba(0, 255, 157, 0.04) 0%, transparent 70%),
+                        radial-gradient(circle at 65% 55%, rgba(255, 184, 0, 0.03) 0%, transparent 70%);
+            animation: wave 18s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(10px, -10px) scale(1.02); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00ff9d, #ffb800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #00ff9d;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00ff9d;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 2rem 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .page-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffffff, #00ff9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 1.3rem;
+            color: #b0b0b0;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            color: #d0d0d0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(0, 255, 157, 0.1);
+            border-color: rgba(0, 255, 157, 0.3);
+            color: #00ff9d;
+            transform: translateY(-2px);
+        }
+
+        .breaking-news {
+            background: linear-gradient(45deg, rgba(255, 64, 129, 0.1), rgba(255, 184, 0, 0.1));
+            border: 1px solid rgba(255, 64, 129, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .breaking-news::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .breaking-label {
+            color: #ff4081;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .breaking-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffffff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .news-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 255, 157, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 255, 157, 0.1);
+        }
+
+        .news-image {
+            height: 200px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 255, 157, 0.1), rgba(255, 184, 0, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .news-card:hover .news-image::before {
+            opacity: 1;
+        }
+
+        .news-icon {
+            font-size: 3rem;
+            color: #00ff9d;
+        }
+
+        .news-content {
+            padding: 1.5rem;
+        }
+
+        .news-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .news-source {
+            background: rgba(0, 255, 157, 0.2);
+            color: #00ff9d;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .news-impact {
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .impact-high {
+            background: rgba(255, 64, 129, 0.2);
+            color: #ff4081;
+        }
+
+        .impact-medium {
+            background: rgba(255, 184, 0, 0.2);
+            color: #ffb800;
+        }
+
+        .impact-low {
+            background: rgba(100, 100, 100, 0.2);
+            color: #888;
+        }
+
+        .news-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .news-excerpt {
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .kevin-analysis {
+            background: rgba(0, 255, 157, 0.05);
+            border-left: 3px solid #00ff9d;
+            padding: 1rem;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 1rem;
+        }
+
+        .analysis-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .analysis-text {
+            color: #d0d0d0;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .news-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .read-more {
+            color: #00ff9d;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: #ffffff;
+        }
+
+        .share-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: #d0d0d0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background: rgba(0, 255, 157, 0.1);
+            border-color: rgba(0, 255, 157, 0.3);
+            color: #00ff9d;
+        }
+
+        .trending-section {
+            margin-top: 4rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 25px;
+            padding: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #00ff9d;
+            text-align: center;
+        }
+
+        .trending-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .trending-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .trending-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 255, 157, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .trending-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00ff9d;
+            margin-bottom: 0.5rem;
+        }
+
+        .trending-title {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .trending-summary {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 100px 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Kevin Svenson Crypto</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="content_analysis_page.html">Content</a></li>
+                <li><a href="trading_bots_page.html">Trading Bots</a></li>
+                <li><a href="blog_page.html">Blog</a></li>
+                <li><a href="news_page.html" class="active">News</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Crypto News, Filtered by a Trader's Mind</h1>
+            <p class="page-subtitle">
+                No hype. No noise. Just the headlines that move markets. Curated and commented by Kevin Svenson.
+            </p>
+        </div>
+
+        <div class="filters">
+            <div class="filter-btn active">All News</div>
+            <div class="filter-btn">Market Moving</div>
+            <div class="filter-btn">DeFi</div>
+            <div class="filter-btn">Bitcoin</div>
+            <div class="filter-btn">Ethereum</div>
+            <div class="filter-btn">Altcoins</div>
+            <div class="filter-btn">Regulation</div>
+            <div class="filter-btn">Institutional</div>
+        </div>
+
+        <div class="breaking-news">
+            <div class="breaking-label">
+                🚨 Breaking News
+            </div>
+            <div class="breaking-title">
+                Federal Reserve Signals Potential Rate Cut - Bitcoin Surges Past $45K
+            </div>
+        </div>
+
+        <div class="news-grid">
+            <article class="news-card">
+                <div class="news-image">
+                    <div class="news-icon">🔗</div>
+                </div>
+                <div class="news-content">
+                    <div class="news-meta">
+                        <span class="news-source">CoinDesk</span>
+                        <span>•</span>
+                        <span>2 hours ago</span>
+                        <span class="news-impact impact-high">High Impact</span>
+                    </div>
+                    <h2 class="news-title">Chainlink x Swift: What's Next for CCIP?</h2>
+                    <p class="news-excerpt">
+                        Chainlink announces expanded partnership with Swift to accelerate cross-chain interoperability protocol adoption across traditional finance institutions.
+                    </p>
+                    <div class="kevin-analysis">
+                        <div class="analysis-label">Kevin's Take</div>
+                        <div class="analysis-text">
+                            "This validates the institutional bridge thesis. LINK has been accumulating for months - expect follow-through above $15.50 resistance."
+                        </div>
+                    </div>
+                    <div class="news-actions">
+                        <a href="#" class="read-more">Read Full Story →</a>
+                        <a href="#" class="share-btn">Share</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="news-image">
+                    <div class="news-icon">₿</div>
+                </div>
+                <div class="news-content">
+                    <div class="news-meta">
+                        <span class="news-source">Bloomberg</span>
+                        <span>•</span>
+                        <span>4 hours ago</span>
+                        <span class="news-impact impact-high">High Impact</span>
+                    </div>
+                    <h2 class="news-title">BTC ETF Flow Analysis Post-FOMC</h2>
+                    <p class="news-excerpt">
+                        Bitcoin ETF inflows surge to $2.3B following dovish Fed commentary, marking the largest single-day inflow since launch.
+                    </p>
+                    <div class="kevin-analysis">
+                        <div class="analysis-label">Kevin's Take</div>
+                        <div class="analysis-text">
+                            "Institutional FOMO kicking in. These flows typically lead price by 3-5 days. Watch for $47K breakout confirmation."
+                        </div>
+                    </div>
+                    <div class="news-actions">
+                        <a href="#" class="read-more">Read Full Story →</a>
+                        <a href="#" class="share-btn">Share</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="news-image">
+                    <div class="news-icon">⚡</div>
+                </div>
+                <div class="news-content">
+                    <div class="news-meta">
+                        <span class="news-source">The Block</span>
+                        <span>•</span>
+                        <span>6 hours ago</span>
+                        <span class="news-impact impact-medium">Medium Impact</span>
+                    </div>
+                    <h2 class="news-title">Ethereum's Infrastructure Tokens Are Waking Up</h2>
+                    <p class="news-excerpt">
+                        Layer 2 and infrastructure tokens show strong momentum as Ethereum staking yields hit new highs and network activity surges.
+                    </p>
+                    <div class="kevin-analysis">
+                        <div class="analysis-label">Kevin's Take</div>
+                        <div class="analysis-text">
+                            "ETH/BTC pair bottoming signals alt season prep. Infrastructure plays like ARB, OP leading - classic rotation pattern."
+                        </div>
+                    </div>
+                    <div class="news-actions">
+                        <a href="#" class="read-more">Read Full Story →</a>
+                        <a href="#" class="share-btn">Share</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="news-image">
+                    <div class="news-icon">🏛️</div>
+                </div>
+                <div class="news-content">
+                    <div class="news-meta">
+                        <span class="news-source">Reuters</span>
+                        <span>•</span>
+                        <span>8 hours ago</span>
+                        <span class="news-impact impact-medium">Medium Impact</span>
+                    </div>
+                    <h2 class="news-title">SEC Approves First Solana ETF Application</h2>
+                    <p class="news-excerpt">
+                        Securities and Exchange Commission grants preliminary approval for VanEck's Solana ETF, pending final documentation review.
+                    </p>
+                    <div class="kevin-analysis">
+                        <div class="analysis-label">Kevin's Take</div>
+                        <div class="analysis-text">
+                            "SOL breaking multi-month consolidation. ETF narrative + meme coin season = explosive combo. Target $180 on breakout."
+                        </div>
+                    </div>
+                    <div class="news-actions">
+                        <a href="#" class="read-more">Read Full Story →</a>
+                        <a href="#" class="share-btn">Share</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="news-image">
+                    <div class="news-icon">🌐</div>
+                </div>
+                <div class="news-content">
+                    <div class="news-meta">
+                        <span class="news-source">CryptoSlate</span>
+                        <span>•</span>
+                        <span>12 hours ago</span>
+                        <span class="news-impact impact-low">Low Impact</span>
+                    </div>
+                    <h2 class="news-title">Major DeFi Protocol Announces V3 Upgrade</h2>
+                    <p class="news-excerpt">
+                        Uniswap reveals details of highly anticipated V3 upgrade featuring improved capital efficiency and reduced gas costs.
+                    </p>
+                    <div class="kevin-analysis">
+                        <div class="analysis-label">Kevin's Take</div>
+                        <div class="analysis-text">
+                            "UNI fundamentals improving but token price disconnected. Wait for DeFi rotation - patience pays in this sector."
+                        </div>
+                    </div>
+                    <div class="news-actions">
+                        <a href="#" class="read-more">Read Full Story →</a>
+                        <a href="#" class="share-btn">Share</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="news-card">
+                <div class="news-image">
+                    <div class="news-icon">🇯🇵</div>
+                </div>
+                <div class="news-content">
+                    <div class="news-meta">
+                        <span class="news-source">Nikkei</span>
+                        <span>•</span>
+                        <span>1 day ago</span>
+                        <span class="news-impact impact-medium">Medium Impact</span>
+                    </div>
+                    <h2 class="news-title">Japan Central Bank Considers Digital Yen Pilot</h2>
+                    <p class="news-excerpt">
+                        Bank of Japan announces plans for comprehensive digital yen pilot program, citing growing international CBDC competition.
+                    </p>
+                    <div class="kevin-analysis">
+                        <div class="analysis-label">Kevin's Take</div>
+                        <div class="analysis-text">
+                            "CBDC news typically neutral for crypto. Real impact comes from implementation timeline - still years away."
+                        </div>
+                    </div>
+                    <div class="news-actions">
+                        <a href="#" class="read-more">Read Full Story →</a>
+                        <a href="#" class="share-btn">Share</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <section class="trending-section">
+            <h2 class="section-title">🔥 Trending Stories</h2>
+            <div class="trending-list">
+                <div class="trending-item">
+                    <div class="trending-number">#1</div>
+                    <div class="trending-title">MicroStrategy Adds Another 5,000 BTC</div>
+                    <div class="trending-summary">Corporate treasury strategy continues with largest single purchase this quarter</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-number">#2</div>
+                    <div class="trending-title">Binance Regulatory Settlement Talks</div>
+                    <div class="trending-summary">Exchange in advanced discussions with multiple jurisdictions for comprehensive compliance framework</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-number">#3</div>
+                    <div class="trending-title">NFT Market Shows Signs of Recovery</div>
+                    <div class="trending-summary">Trading volumes up 340% month-over-month as blue chip collections regain momentum</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-number">#4</div>
+                    <div class="trending-title">AI Crypto Tokens Surge on OpenAI News</div>
+                    <div class="trending-summary">Artificial intelligence related cryptocurrencies rally following major tech partnership announcements</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-number">#5</div>
+                    <div class="trending-title">Stablecoin Market Cap Hits New High</div>
+                    <div class="trending-summary">Total stablecoin supply reaches $180B as institutional adoption accelerates across regions</div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-number">#6</div>
+                    <div class="trending-title">GameFi Sector Attracts Fresh Investment</div>
+                    <div class="trending-summary">$500M in new funding signals renewed interest in blockchain gaming and virtual economies</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Filter logic would go here in a real application
+                console.log('Filtering by:', btn.textContent);
+            });
+        });
+
+        // News card interactions
+        document.querySelectorAll('.news-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'A') {
+                    const readMoreLink = card.querySelector('.read-more');
+                    if (readMoreLink) {
+                        console.log('Opening news article:', card.querySelector('.news-title').textContent);
+                    }
+                }
+            });
+        });
+
+        // Share button functionality
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const newsTitle = btn.closest('.news-card').querySelector('.news-title').textContent;
+                
+                // Simulate sharing
+                btn.textContent = 'Shared!';
+                btn.style.background = 'rgba(0, 255, 157, 0.2)';
+                btn.style.color = '#00ff9d';
+                
+                setTimeout(() => {
+                    btn.textContent = 'Share';
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                    btn.style.color = '#d0d0d0';
+                }, 2000);
+                
+                console.log('Sharing:', newsTitle);
+            });
+        });
+
+        // Animate news cards on load
+        const newsCards = document.querySelectorAll('.news-card');
+        newsCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 150);
+        });
+
+        // Trending items interaction
+        document.querySelectorAll('.trending-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const title = item.querySelector('.trending-title').textContent;
+                console.log('Opening trending story:', title);
+            });
+        });
+
+        // Simulate real-time news updates
+        function updateBreakingNews() {
+            const breakingNews = document.querySelector('.breaking-title');
+            const breakingMessages = [
+                'Federal Reserve Signals Potential Rate Cut - Bitcoin Surges Past $45K',
+                'Major Exchange Announces Zero-Fee Bitcoin Trading',
+                'European Union Approves Comprehensive Crypto Regulation Framework',
+                'Tesla Reports Q4 Bitcoin Holdings Increase by 15%',
+                'Ethereum 2.0 Staking Rewards Hit All-Time High'
+            ];
+            
+            let currentIndex = 0;
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % breakingMessages.length;
+                breakingNews.textContent = breakingMessages[currentIndex];
+            }, 15000); // Update every 15 seconds
+        }
+
+        updateBreakingNews();
+
+        // Add live timestamp updates
+        function updateTimestamps() {
+            const timeElements = document.querySelectorAll('.news-meta span:nth-child(3)');
+            timeElements.forEach(element => {
+                const currentText = element.textContent;
+                if (currentText.includes('hours ago')) {
+                    const hours = parseInt(currentText);
+                    if (Math.random() > 0.7) { // 30% chance to update
+                        element.textContent = `${hours + 1} hours ago`;
+                    }
+                }
+            });
+        }
+
+        // Update timestamps every 30 seconds for demo
+        setInterval(updateTimestamps, 30000);
+
+        // Add impact badge hover effects
+        document.querySelectorAll('.news-impact').forEach(badge => {
+            badge.addEventListener('mouseenter', () => {
+                badge.style.transform = 'scale(1.1)';
+            });
+            
+            badge.addEventListener('mouseleave', () => {
+                badge.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
